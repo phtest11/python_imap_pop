@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   Author: 松鼠先生
+#   Author: 王玉鹏
 #   Email: wangyupeng129#126.com
 
 import os
