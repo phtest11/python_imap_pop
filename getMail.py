@@ -21,10 +21,10 @@ MAILADDR = "jiayuan_test@126.com"
 PASSWORD = "jiayuan"
 
 # Mail Server (pop/imap)
-SERVER = "pop.126.com"
+SERVER = "imap.126.com"
 
 # Transfer protocol (pop3/imap4)
-PROTOCOL = "pop3"
+PROTOCOL = "imap"
 
 # Use SSL? (True/False)
 USE_SSL = True
@@ -39,7 +39,7 @@ OUTDIR = "result"
 # Default port of each protocol
 DEFAULT_PORT = {
     "pop3": {False: 110, True: 995},
-    "imap3": {False: 143, True: 993},
+    "imap4": {False: 143, True: 993},
 }
 
 
@@ -109,7 +109,7 @@ def create_dir(result_path):
     """
     try:
         if not os.path.exists(result_path):
-            os.mkdir(result_path)
+            os.makedirs(result_path)
             print("[*] Create directory {0} successfully".format(result_path))
         else:
             if os.path.isfile(result_path):
@@ -167,12 +167,14 @@ def pop3(host, port, usr, pwd, use_ssl):
         conn.user(usr)
         conn.pass_(pwd)
         print("[+] Connect to {0}:{1} successfully".format(host, port))
+        print('[+] Messages: %s. Size: %s' % conn.stat())
     except BaseException as e:
         exit_script("Connect to {0}:{1} failed".format(host, port), e)
     
     # Get email message number
     try:
         msg_num = len(conn.list()[1])
+
         print("[*] {0} emails found in {1}".format(msg_num, usr))
     except BaseException as e:
         exit_script("Can't get email number", e)
