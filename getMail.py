@@ -1,6 +1,9 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+#   Author: 松鼠先生
+#   Email: wangyupeng129#126.com
+
 import os
 import re
 import time
