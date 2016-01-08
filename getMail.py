@@ -6,13 +6,18 @@
 
 import os
 import re
+import sys
 import time
 import email
 import poplib
 import imaplib
 import cStringIO
+import chardet
+import codecs
 from hashlib import md5
 
+reload(sys)
+sys.setdefaultencoding("utf-8") 
 
 # Configuration
 # -------------
@@ -24,10 +29,10 @@ MAILADDR = "jiayuan_test@126.com"
 PASSWORD = "jiayuan"
 
 # Mail Server (pop/imap)
-SERVER = "imap.126.com"
+SERVER = "pop.126.com"
 
 # Transfer protocol (pop3/imap4)
-PROTOCOL = "imap"
+PROTOCOL = "pop"
 
 # Use SSL? (True/False)
 USE_SSL = True
@@ -311,10 +316,23 @@ def parse_email(msg, i):
     """
     global result_file
     
+    subject = email.Header.decode_header(msg['subject'])[0][0]
+    subcode = email.Header.decode_header(msg['subject'])[0][1]
+
+    if subcode:
+        subject = unicode(subject, subcode).encode("utf-8") 
+
+    from_email = email.Header.decode_header(msg['From'])[0][0]
+    to_email = email.Header.decode_header(msg['To'])[0][0]
+    date = email.Header.decode_header(msg['date'])[0][0]
+    print '------------------------------start--------------------' 
+    print email.Header.decode_header(msg['From'])
+    print '------------------------------end--------------------' 
     # Parse and save email content and attachments
     for part in msg.walk():
         if not part.is_multipart():
             filename = part.get_filename()
+            charset = part.get_content_charset()
             content = part.get_payload(decode=True)
             
             if filename:  # Attachment
@@ -333,6 +351,11 @@ def parse_email(msg, i):
             
             try:
                 with open(result_file, "wb") as f:
+                    content_charset_info = chardet.detect(content)
+                    
+                    if content_charset_info['encoding'] and content_charset_info['confidence'] > 0.9:
+                        content = unicode(content, content_charset_info['encoding'], errors='ignore')
+ 
                     f.write(content)
             except BaseException as e:
                 print("[-] Write file of email {0} failed: {1}".format(i, e))
